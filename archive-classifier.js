@@ -36,10 +36,10 @@ const SUBCATEGORIES = [
       '工会', '团委', '妇联', '统战', '民主党派',
       '宣传', '组织', '精神文明', '思想政治', '理论学习',
       '主题教育', '党史', '廉政', '作风建设',
-      '入党', '党费', '党组织', '党性',
+      '入党', '党费', '党组织', '党性', '党',
     ],
     subcategories: [
-      { id: '1', name: '党委综合性工作', keywords: ['党委', '三重一大', '巡察', '巡视', '党员代表大会', '党代会', '保密', '规章制度', '条例', '办法', '通报'] },
+      { id: '1', name: '党委综合性工作', keywords: ['党委', '三重一大', '巡察', '巡视', '党员代表大会', '党代会', '保密', '规章制度', '条例', '办法'] },
       { id: '2', name: '党群机构设置', keywords: ['机构设置', '组织工作', '党员管理', '党员名册', '干部考察', '干部任免', '任免', '党组织关系', '招聘', '统计年报', '编制'] },
       { id: '3', name: '宣传教育统战', keywords: ['宣传', '出版', '报刊', '广播', '精神文明建设', '统战', '民主党派', '无党派', '民族', '宗教', '港澳台'] },
       { id: '4', name: '纪检监察', keywords: ['党风', '党纪', '纪检', '监察', '案件', '信访', '廉政', '违纪', '效能监察', '审理'] },
@@ -134,14 +134,14 @@ const RETENTION_RULES = [
       '审计报告', '验资报告', '评估报告',
       '拆迁补偿',
       '股权', '出资',
+      '合同', '制度', '人事', '任免', '职工奖惩',
     ]
   },
   {
     code: 'D30', label: '30年',
     keywords: [
-      '合同', '协议', '制度', '管理办法', '规定', '细则',
+      '协议', '管理办法', '规定', '细则',
       '会议记录', '项目', '工程',
-      '人事', '任免',
       '请示', '批复',
       '规划', '计划',
     ]
@@ -210,6 +210,15 @@ function determineRetention(text, filename) {
 function classifyDocument(text, filename) {
   const combined = text + '\n' + filename;
 
+  // 党政联席归入 B类-行政管理
+  if (combined.includes('党政联席')) {
+    const bCat = SUBCATEGORIES.find(c => c.code === 'B');
+    return {
+      category: { code: 'B', name: 'B类-行政管理' },
+      subcategory: bCat.subcategories[0]
+    };
+  }
+
   // 1. 评分：确定所属大类
   const scored = SUBCATEGORIES.map(cat => {
     let score = 0;
@@ -249,6 +258,11 @@ function classifyDocument(text, filename) {
   };
 }
 
+// 判断文件级别：正旺煤业 → 本级文，其余（汾西矿业、孝义公司等）→ 上级文
+function isUpperLevel(text, filename) {
+  return !(text + '\n' + filename).includes('正旺');
+}
+
 // ============ 文件扫描 ============
 
 function scanPDFs(dirPath) {
@@ -286,6 +300,7 @@ function findAttachments(pdfPath) {
 
 function createArchiveStructure(baseDir) {
   const dirs = ['永久', '30年', '10年'];
+  const levelDirs = ['本级文', '上级文'];
   const created = [];
 
   for (const cat of SUBCATEGORIES) {
@@ -297,8 +312,13 @@ function createArchiveStructure(baseDir) {
       fs.mkdirSync(retDir, { recursive: true });
       created.push(retDir);
       for (const sub of cat.subcategories) {
-        fs.mkdirSync(path.join(retDir, sub.name), { recursive: true });
-        created.push(path.join(retDir, sub.name));
+        const subDir = path.join(retDir, sub.name);
+        fs.mkdirSync(subDir, { recursive: true });
+        created.push(subDir);
+        for (const ld of levelDirs) {
+          fs.mkdirSync(path.join(subDir, ld), { recursive: true });
+          created.push(path.join(subDir, ld));
+        }
       }
     }
   }
@@ -353,10 +373,12 @@ function organizeFiles(rows, outputDir) {
       row.retention.label,
       safePathSegment(row.subcategory.name)
     );
+    const levelDir = path.join(baseDir, row.isUpper ? '上级文' : '本级文');
     const hasAttachments = row.attachments && row.attachments.length > 0;
 
+    // 诊断：打印每条记录的拷贝路径
     if (hasAttachments) {
-      const subDir = path.join(baseDir, safeName);
+      const subDir = path.join(levelDir, safeName);
       for (const f of [row.fullPath, ...row.attachments]) {
         const dest = path.join(subDir, safePathSegment(path.basename(f)));
         try {
@@ -366,7 +388,7 @@ function organizeFiles(rows, outputDir) {
         } catch (e) { skipped++; errors.push(`附件 ${path.basename(f)}: ${e.message}`); }
       }
     } else {
-      const dest = path.join(baseDir, safeName + '.pdf');
+      const dest = path.join(levelDir, safeName + '.pdf');
       try {
         console.log(`  📄 ${row.name} → ${dest}`);
         copyOneFile(row.fullPath, dest);
@@ -449,6 +471,10 @@ async function main() {
     const { category, subcategory } = classifyDocument(contentForAnalysis, name);
     const retention = determineRetention(contentForAnalysis, name);
 
+    // 判断文件级别：正旺煤业→本级文，其余→上级文
+    const upperText = text + name;
+    const isUpper = !upperText.includes('正旺');
+
     // 日期
     const date = stat.mtime.toLocaleDateString('zh-CN');
 
@@ -456,7 +482,7 @@ async function main() {
     const isScanned = !text || text.length < 20;
 
     rows.push({
-      index: i + 1, name, pages, date, retention, category, subcategory,
+      index: i + 1, name, pages, date, retention, category, subcategory, isUpper,
       fullPath: filePath, textPreview: text.substring(0, 100) || '(扫描件，无文本)',
       isScanned, attachments
     });
@@ -464,10 +490,11 @@ async function main() {
     const dispName = name.length > 32 ? name.substring(0, 29) + '...' : name;
     const scanned = isScanned ? ' 📷' : '';
     const hasFiles = attachments.length > 0 ? ' 📎' : '';
+    const levelMark = isUpper ? ' ↑' : '';
     console.log('\r' + String(i + 1).padEnd(5) + dispName.padEnd(40) +
       String(pages).padEnd(5) + retention.label.padEnd(8) +
       `${category.code}`.padEnd(18) +
-      `${subcategory.id} ${subcategory.name}${scanned}${hasFiles}`);
+      `${subcategory.id} ${subcategory.name}${scanned}${hasFiles}${levelMark}`);
   }
 
   // 清除 pdfjs 引用，让 Worker 线程自然退出
@@ -476,7 +503,8 @@ async function main() {
   await new Promise(resolve => setImmediate(resolve));
 
   console.log('\n' + '='.repeat(100));
-  console.log(`\n✅ 共分析 ${rows.length} 个文件`);
+  console.log(`\n✅ 共分析 ${rows.length} 个文件` +
+    `（上级文 ${rows.filter(r => r.isUpper).length} 份，本级文 ${rows.filter(r => !r.isUpper).length} 份）`);
 
   // ========== 统计 ==========
   console.log('\n--- 分类统计 ---');
@@ -509,9 +537,9 @@ async function main() {
   // ========== CSV 导出（含正文摘要） ==========
   fs.mkdirSync(resolvedOutput, { recursive: true });
   const csvPath = path.join(resolvedOutput, '档案分类结果.csv');
-  const csvHeader = '序号,文件名,页数,生成日期,保管期限,分类代码,分类名称,小类代码,小类名称,扫描件,附件数,正文摘要\n';
+  const csvHeader = '序号,文件名,页数,生成日期,保管期限,分类代码,分类名称,小类代码,小类名称,文件级别,扫描件,附件数,正文摘要\n';
   const csvRows = rows.map(r =>
-    `${r.index},"${r.name}",${r.pages},${r.date},${r.retention.label},${r.category.code},${r.category.name},${r.subcategory ? r.subcategory.id : '-'},${r.subcategory ? r.subcategory.name : '-'},${r.isScanned ? '是' : '否'},${r.attachments ? r.attachments.length : 0},"${(r.textPreview || '').replace(/"/g, '""')}"`
+    `${r.index},"${r.name}",${r.pages},${r.date},${r.retention.label},${r.category.code},${r.category.name},${r.subcategory ? r.subcategory.id : '-'},${r.subcategory ? r.subcategory.name : '-'},${r.isUpper ? '上级文' : '本级文'},${r.isScanned ? '是' : '否'},${r.attachments ? r.attachments.length : 0},"${(r.textPreview || '').replace(/"/g, '""')}"`
   ).join('\n');
   fs.writeFileSync(csvPath, '﻿' + csvHeader + csvRows, 'utf-8');
   console.log(`\n📄 分类清单导出: ${csvPath}`);
@@ -579,9 +607,24 @@ async function main() {
 
       for (const [subName, subGroup] of Object.entries(subGroups)) {
         console.log(`      │   ├── ${subName}/`);
-        for (const r of subGroup) {
-          const attMark = r.attachments && r.attachments.length > 0 ? ` (含${r.attachments.length}个附件)` : '';
-          console.log(`      │   │   ├── ${r.name}.pdf${attMark}`);
+
+        // 本级文和上级文分开显示
+        const lower = subGroup.filter(r => !r.isUpper);
+        const upper = subGroup.filter(r => r.isUpper);
+
+        if (lower.length > 0) {
+          console.log(`      │   │   ├── 本级文/`);
+          for (const r of lower) {
+            const attMark = r.attachments && r.attachments.length > 0 ? ` (含${r.attachments.length}个附件)` : '';
+            console.log(`      │   │   │   ├── ${r.name}.pdf${attMark}`);
+          }
+        }
+        if (upper.length > 0) {
+          console.log(`      │   │   └── 上级文/`);
+          for (const r of upper) {
+            const attMark = r.attachments && r.attachments.length > 0 ? ` (含${r.attachments.length}个附件)` : '';
+            console.log(`      │   │       ├── ${r.name}.pdf${attMark}`);
+          }
         }
       }
     }
