@@ -39,7 +39,7 @@ const SUBCATEGORIES = [
       '入党', '党费', '党组织', '党性', '党',
     ],
     subcategories: [
-      { id: '1', name: '党委综合性工作', keywords: ['党委', '三重一大', '巡察', '巡视', '党员代表大会', '党代会', '保密', '规章制度', '条例', '办法'] },
+      { id: '1', name: '党委综合性工作', keywords: ['党委', '党组', '党总支', '党支部', '三重一大', '巡察', '巡视', '党员代表大会', '党代会', '保密', '规章制度', '条例', '办法', '会议纪要', '纪要'] },
       { id: '2', name: '党群机构设置', keywords: ['机构设置', '组织工作', '党员管理', '党员名册', '干部考察', '干部任免', '任免', '党组织关系', '招聘', '统计年报', '编制'] },
       { id: '3', name: '宣传教育统战', keywords: ['宣传', '出版', '报刊', '广播', '精神文明建设', '统战', '民主党派', '无党派', '民族', '宗教', '港澳台'] },
       { id: '4', name: '纪检监察', keywords: ['党风', '党纪', '纪检', '监察', '案件', '信访', '廉政', '违纪', '效能监察', '审理'] },
@@ -51,23 +51,92 @@ const SUBCATEGORIES = [
   {
     code: 'B', name: 'B类-行政管理',
     keywords: [
-      '会议纪要', '纪要', '通知', '请示', '批复',
+      '会议纪要', '纪要', '通知', '通报', '请示', '批复',
       '制度', '章程', '管理办法', '规定', '细则',
       '报告', '总结', '计划', '简报', '函',
       '行政', '办公', '人事', '考勤',
       '任免', '招聘', '培训', '考核',
       '工作要点', '工作安排', '方案',
       '后勤', '接待', '公文', '保密',
+      '法律', '法务', '审计', '信访',
     ],
     subcategories: [
-      { id: '1', name: '行政事务', keywords: ['行政', '会议纪要', '纪要', '办公', '文秘', '董事会', '监事会', '股东会', '督查', '制度', '规章'] },
-      { id: '2', name: '劳动人事', keywords: ['人事', '劳动', '招聘', '任免', '考勤', '薪酬', '工资', '社保', '劳动合同', '用工'] },
-      { id: '3', name: '教育培训', keywords: ['培训', '教育', '进修', '学习', '继续教育', '培训计划'] },
-      { id: '4', name: '后勤福利', keywords: ['后勤', '福利', '公积金', '食堂', '宿舍', '车辆', '办公用品'] },
-      { id: '5', name: '医疗卫生', keywords: ['医疗', '卫生', '健康', '体检', '防疫', '医保', '职业病'] },
-      { id: '6', name: '档案工作', keywords: ['档案', '归档', '文件管理', '档案管理'] },
-      { id: '7', name: '武装保卫', keywords: ['武装', '保卫', '消防', '治安', '安保', '门卫'] },
-      { id: '8', name: '外事外贸', keywords: ['外事', '外贸', '外宾', '出国', '涉外', '外事活动'] },
+      // B·11 行政事务（含文秘、机要、档案、董事会/监事会/股东会事务）
+      { id: '1', name: '行政事务', keywords: [
+        '行政事务', '行政', '会议纪要', '纪要', '办公', '办公会', '局务会', '矿务会',
+        '文秘', '公文', '机要', '保密',
+        '董事会', '监事会', '股东会', '董事会决议', '监事会决议',
+        '督查', '督办', '值班', '接待', '公务接待',
+        '制度', '规章', '规章制度', '议事规则', '法人治理',
+        '档案', '归档', '档案管理', '文件管理', '档案移交', '销毁清册',
+        '年度工作会议', '工作要点',
+      ] },
+      // B·12 人事（含干部管理、招聘录用、薪酬绩效、职称、劳动保护）
+      { id: '2', name: '劳动人事', keywords: [
+        '人事', '人力资源', '劳动', '用工', '劳务',
+        '招聘', '录用', '转正', '调配', '调动',
+        '任免', '干部任免', '干部管理', '干部考察',
+        '考勤', '休假', '薪酬', '工资', '奖金', '津贴', '福利',
+        '社保', '五险一金', '养老保险', '劳动合同',
+        '职称', '职称评审', '技能鉴定', '绩效', '考核',
+        '职工名册', '花名册', '人员名册',
+        '退休', '离退休', '辞职', '离职', '抚恤', '安置',
+        '劳动保护', '劳动安全', '职业健康',
+        '通报', '处理决定',
+      ] },
+      // B·13 法纪监察（含法律事务、政纪监察、违纪案件、纠纷诉讼）
+      { id: '3', name: '法纪监察', keywords: [
+        '法律', '法规', '法务', '合规', '合法性',
+        '诉讼', '仲裁', '纠纷', '案件', '争议',
+        '律师', '公证', '普法', '法治', '法制',
+        '纪检', '监察', '违纪', '廉政', '政纪',
+        '行政处罚', '行政复议',
+      ] },
+      // B·14 审计
+      { id: '4', name: '审计', keywords: [
+        '审计', '审计报告', '审计决定', '审计计划',
+        '内审', '内部审计', '专项审计',
+        '经济责任审计', '审计底稿',
+        '内控', '内部控制', '风险评估',
+      ] },
+      // B·15 教育培训
+      { id: '5', name: '教育培训', keywords: [
+        '培训', '培训计划', '培训教材',
+        '教育', '职业教育', '继续教育', '学历教育',
+        '进修', '学习', '岗位培训',
+        '安全培训', '技能培训', '特种作业',
+        '职工培训', '培训考核',
+      ] },
+      // B·16 外事
+      { id: '6', name: '外事', keywords: [
+        '外事', '外事活动', '涉外',
+        '出国', '出访', '考察', '访问',
+        '外贸', '进出口', '外宾', '接待',
+        '国际合作', '谈判',
+      ] },
+      // B·17 后勤福利
+      { id: '7', name: '后勤福利', keywords: [
+        '后勤', '福利', '食堂', '餐饮', '宿舍', '住房',
+        '公积金', '车辆', '通勤', '办公用品',
+        '物业', '维修', '绿化', '招待所',
+        '劳保用品', '物资供应',
+      ] },
+      // B·18 医疗卫生
+      { id: '8', name: '医疗卫生', keywords: [
+        '医疗', '卫生', '健康', '体检', '健康档案',
+        '防疫', '疫情', '疫情防控',
+        '医保', '医疗保险', '工伤', '救护',
+        '职业病', '计划生育', '计生', '医务室',
+      ] },
+      // B·19 武装保卫（含消防、治安、综合治理、民兵）
+      { id: '9', name: '武装保卫', keywords: [
+        '武装', '民兵', '人防', '军事',
+        '保卫', '安保', '门卫', '值班巡逻', '监控',
+        '消防', '防火', '灭火',
+        '治安', '综合治理', '维稳',
+        '交通安全', '车辆管理',
+        '爆炸物品', '枪支弹药',
+      ] },
     ]
   },
   {
@@ -123,27 +192,88 @@ const SUBCATEGORIES = [
 ];
 
 const RETENTION_RULES = [
+  // ==================== 永久 ====================
+  // 依据：国家档案局第8号令《文书档案保管期限表》、第10号令《企业文件材料归档范围和档案保管期限规定》
+  // 核心原则：凡与产权、资产、股权、职工切身利益、企业核心职能相关的重要文件一律永久保管
   {
     code: 'Y', label: '永久',
     keywords: [
-      '董事会决议', '股东会决议', '监事会决议',
-      '章程', '年报', '年度报告',
-      '名册', '花名册', '清册',
-      '产权证', '房产证', '土地证',
-      '资质', '许可证', '营业执照', '批准证书',
-      '审计报告', '验资报告', '评估报告',
-      '拆迁补偿',
+      // ── 企业设立变更解散改制 ──
+      '企业设立', '企业改制', '企业合并', '企业分立', '企业解散', '企业破产', '企业上市',
+      '公司章程', '公司设立', '批准证书',
+      // ── 董事会/监事会/股东会 ──
+      '董事会决议', '监事会决议', '股东会决议', '董事会会议', '监事会会议',
+      '股东大会', '董事会', '监事会', '股东会',
+      // ── 产权资产不动产 ──
+      '产权证', '房产证', '土地证', '不动产权', '房屋所有权',
+      '资产评估', '资产转让', '国有资产',
+      '产权', '矿业权',
+      // ── 年度及中长期规划总结 ──
+      '年度报告', '年度总结', '年度计划', '中长期规划', '发展规划',
+      '工作要点', '年报', '综合统计', '统计年报',
+      // ── 机构编制 ──
+      '机构设置', '人员编制', '机构撤并', '机构撤销', '名称更改',
+      '印信启用', '印信作废', '组织简则',
+      // ── 人事任免职工管理 ──
+      '人事任免', '干部任免', '任免',
+      '职工录用', '转正', '调资', '离退休', '抚恤',
+      '职工名册', '花名册', '人员名册', '清册',
+      // ── 表彰奖励处分 ──
+      '劳动模范', '先进单位', '先进工作者', '表彰决定',
+      '处分决定', '处理决定', '违纪处理', '政务处分',
+      // ── 重要合同协议 ──
+      '重要合同', '重要协议', '合资合同', '投资协议', '股权转让',
+      '合作合同', '战略合作',
+      // ── 规章制度 ──
+      '章程', '规章制度', '制度汇编',
+      // ── 审计评估财务 ──
+      '审计报告', '验资报告', '评估报告', '决算报告', '财务决算',
+      // ── 资质证照（尤其煤矿行业） ──
+      '资质证书', '许可证', '采矿许可证', '安全生产许可证',
+      '煤炭生产许可证', '营业执照',
+      // ── 党团工会 ──
+      '党员代表大会', '党代会', '职工代表大会', '职代会',
+      '工会换届', '团委换届', '工会工作报告', '团委工作报告',
+      '党总支', '党支部', '党委会', '党委会议', '党组织建设', '党员管理', '党建',
+      // ── 拆迁补偿土地房屋 ──
+      '拆迁补偿', '拆迁安置', '土地征用', '房屋买卖',
+      // ── 纪检监察 ──
+      '纪检监察', '廉政建设', '巡视整改', '巡察整改',
+      // ── 股权出资 ──
       '股权', '出资',
-      '合同', '制度', '人事', '任免', '职工奖惩',
+      // ── 重要会议 ──
+      '党政联席', '办公会纪要',
     ]
   },
+  // ==================== 30年 ====================
+  // 依据：具有较重要查考价值、但尚未达到永久保管条件的一般性业务文件
   {
     code: 'D30', label: '30年',
     keywords: [
-      '协议', '管理办法', '规定', '细则',
-      '会议记录', '项目', '工程',
+      // ── 一般合同协议 ──
+      '合同', '协议',
+      // ── 管理制度办法 ──
+      '管理办法', '管理规定', '管理制度', '实施细则', '办法', '规定', '细则',
+      // ── 会议记录纪要（一般性） ──
+      '会议记录', '会议纪要', '纪要', '办公会议', '专题会议',
+      // ── 请示批复（一般性） ──
       '请示', '批复',
-      '规划', '计划',
+      // ── 项目工程 ──
+      '项目', '工程', '基建', '建设项目', '技术改造',
+      // ── 规划计划（非年度） ──
+      '专项规划', '工作规划', '工作计划', '实施方案', '业务计划',
+      // ── 一般人事 ──
+      '人事制度', '考核', '职称', '聘任', '培训计划',
+      // ── 业务报告 ──
+      '工作报告', '调研报告', '专题报告', '汇报材料',
+      // ── 出国外事 ──
+      '出国', '出访', '考察报告', '外事活动',
+      // ── 物资采购招标 ──
+      '招标', '投标', '采购', '物资采购', '招标文件',
+      // ── 预算 ──
+      '预算', '财务预算',
+      // ── 信访 ──
+      '信访', '来信来访',
     ]
   }
 ];
@@ -166,7 +296,6 @@ async function extractText(filePath) {
   try {
     const buf = fs.readFileSync(filePath);
     const pdfjs = await getPDFjs();
-    // 独立拷贝，避免 Node Buffer 与异步解析共用底层 ArrayBuffer 导致不稳定
     const data = new Uint8Array(buf);
     doc = await pdfjs.getDocument({
       data,
@@ -174,13 +303,18 @@ async function extractText(filePath) {
       disableFontFace: true,
     }).promise;
 
+    const pages = doc.numPages;
     let text = '';
-    for (let i = 1; i <= doc.numPages; i++) {
-      const page = await doc.getPage(i);
-      const content = await page.getTextContent();
-      text += content.items.map(item => item.str).join('') + '\n';
+    for (let i = 1; i <= pages; i++) {
+      try {
+        const page = await doc.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join('') + '\n';
+      } catch {
+        /* 单页提取失败不影响其他页 */
+      }
     }
-    return { text: text.trim(), pages: doc.numPages };
+    return { text: text.trim(), pages };
   } catch {
     return { text: '', pages: '?' };
   } finally {
@@ -194,10 +328,64 @@ async function extractText(filePath) {
   }
 }
 
+/** 从 PDF 元数据或文件名中提取文档日期 */
+async function extractDate(filePath, text, filename) {
+  // 1. 尝试从 PDF 元数据获取创建日期
+  try {
+    const buf = fs.readFileSync(filePath);
+    const pdfjs = await getPDFjs();
+    const data = new Uint8Array(buf);
+    const doc = await pdfjs.getDocument({ data, useSystemFonts: true, disableFontFace: true }).promise;
+    const meta = await doc.getMetadata();
+    if (meta && meta.info && meta.info.CreationDate) {
+      const raw = meta.info.CreationDate;
+      // PDF 日期格式: D:20240101120000
+      const m = raw.match(/(\d{4})(\d{2})(\d{2})/);
+      if (m) return `${m[1]}年${m[2]}月${m[3]}日`;
+    }
+    if (doc.destroy) await doc.destroy();
+  } catch { /* PDF 元数据不可用 */ }
+
+  // 2. 从文件名提取日期
+  const fnPatterns = [
+    /(\d{4})年(\d{1,2})月(\d{1,2})日/,
+    /(\d{4})-(\d{2})-(\d{2})/,
+    /(\d{4})\.(\d{2})\.(\d{2})/,
+    /(\d{4})(\d{2})(\d{2})/,
+  ];
+  for (const p of fnPatterns) {
+    const m = filename.match(p);
+    if (m) return `${m[1]}年${m[2]}月${m[3]}日`;
+  }
+
+  // 3. 从文件正文提取日期
+  for (const p of fnPatterns) {
+    const m = text.match(p);
+    if (m) return `${m[1]}年${m[2]}月${m[3]}日`;
+  }
+
+  // 4. 回退到文件修改时间
+  try {
+    const stat = fs.statSync(filePath);
+    return stat.mtime.toLocaleDateString('zh-CN');
+  } catch {
+    return '未知';
+  }
+}
+
 // ============ 分析函数 ============
 
 function determineRetention(text, filename) {
   const combined = text + '\n' + filename;
+  // 文件名含"通报"的归为永久保管
+  if (filename.includes('通报')) {
+    return { code: 'Y', label: '永久' };
+  }
+
+  // 出现人名（XXX同志模式）的归为永久保管
+  if (/[一-龥]{2,4}同志/.test(combined)) {
+    return { code: 'Y', label: '永久' };
+  }
 
   for (const rule of RETENTION_RULES) {
     for (const kw of rule.keywords) {
@@ -209,6 +397,16 @@ function determineRetention(text, filename) {
 
 function classifyDocument(text, filename) {
   const combined = text + '\n' + filename;
+
+  // 党总支/党支部/党委会会议纪要归入 A类-党群工作/党委综合性工作
+  if ((combined.includes('党总支') || combined.includes('党支部') || combined.includes('党委会')) &&
+      (combined.includes('会议纪要') || combined.includes('纪要') || combined.includes('会议记录'))) {
+    const aCat = SUBCATEGORIES.find(c => c.code === 'A');
+    return {
+      category: { code: 'A', name: 'A类-党群工作' },
+      subcategory: aCat.subcategories[0]
+    };
+  }
 
   // 党政联席归入 B类-行政管理
   if (combined.includes('党政联席')) {
@@ -258,9 +456,13 @@ function classifyDocument(text, filename) {
   };
 }
 
-// 判断文件级别：正旺煤业 → 本级文，其余（汾西矿业、孝义公司等）→ 上级文
+// 判断文件级别：正旺煤业或汾旺字号发文 → 本级文，其余（汾西矿业、孝义公司等）→ 上级文
 function isUpperLevel(text, filename) {
-  return !(text + '\n' + filename).includes('正旺');
+  const combined = text + '\n' + filename;
+  if (combined.includes('正旺')) return false;
+  // 匹配"汾旺X发"字号模式（如：汾旺政发、汾旺党发、汾旺煤发、汾旺办发等）
+  if (/汾旺.{1,3}发/.test(combined)) return false;
+  return true;
 }
 
 // ============ 文件扫描 ============
@@ -436,13 +638,16 @@ async function main() {
   // ========== 扫描 ==========
   console.log(`\n📂 扫描目录: ${resolvedTarget}`);
   const files = scanPDFs(resolvedTarget);
+  const mainFiles = files.filter(f => !path.basename(f).includes('发文卡'));
+  const filteredCount = files.length - mainFiles.length;
 
-  if (files.length === 0) {
+  if (mainFiles.length === 0) {
     console.log('未找到 PDF 文件。');
     process.exit(0);
   }
 
-  console.log(`找到 ${files.length} 个 PDF 文件\n`);
+  console.log(`找到 ${mainFiles.length} 个 PDF 文件` +
+    (filteredCount > 0 ? `（已排除 ${filteredCount} 个发文卡）` : '') + '\n');
 
   // ========== 分析 ==========
   const header = '序号'.padEnd(5) + '文件名'.padEnd(40) + '页数'.padEnd(5) + '保管期限'.padEnd(8) + '大类'.padEnd(18) + '小类';
@@ -452,13 +657,13 @@ async function main() {
 
   const rows = [];
 
-  for (let i = 0; i < files.length; i++) {
-    const filePath = files[i];
+  for (let i = 0; i < mainFiles.length; i++) {
+    const filePath = mainFiles[i];
     const name = path.basename(filePath, '.pdf');
     const stat = fs.statSync(filePath);
 
     // 显示进度
-    process.stdout.write(`\r正在分析第 ${i + 1}/${files.length} 个文件...`);
+    process.stdout.write(`\r正在分析第 ${i + 1}/${mainFiles.length} 个文件...`);
 
     // 查找附件（与 PDF 同目录的非 PDF 文件）
     const attachments = findAttachments(filePath);
@@ -471,12 +676,12 @@ async function main() {
     const { category, subcategory } = classifyDocument(contentForAnalysis, name);
     const retention = determineRetention(contentForAnalysis, name);
 
-    // 判断文件级别：正旺煤业→本级文，其余→上级文
+    // 判断文件级别
     const upperText = text + name;
     const isUpper = !upperText.includes('正旺');
 
     // 日期
-    const date = stat.mtime.toLocaleDateString('zh-CN');
+    const date = await extractDate(filePath, text, name);
 
     // 判断是否是扫描件
     const isScanned = !text || text.length < 20;
