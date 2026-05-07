@@ -303,7 +303,7 @@ async function extractText(filePath) {
       disableFontFace: true,
     }).promise;
 
-    const pages = doc.numPages;
+    const pages = doc.numPages || 0;
     let text = '';
     for (let i = 1; i <= pages; i++) {
       try {
@@ -328,7 +328,7 @@ async function extractText(filePath) {
   }
 }
 
-/** 从 PDF 元数据或文件名中提取文档日期 */
+/** 从 PDF 元数据、文件名或正文中提取文档日期 */
 async function extractDate(filePath, text, filename) {
   // 1. 尝试从 PDF 元数据获取创建日期
   try {
@@ -339,7 +339,6 @@ async function extractDate(filePath, text, filename) {
     const meta = await doc.getMetadata();
     if (meta && meta.info && meta.info.CreationDate) {
       const raw = meta.info.CreationDate;
-      // PDF 日期格式: D:20240101120000
       const m = raw.match(/(\d{4})(\d{2})(\d{2})/);
       if (m) return `${m[1]}年${m[2]}月${m[3]}日`;
     }
@@ -347,6 +346,10 @@ async function extractDate(filePath, text, filename) {
   } catch { /* PDF 元数据不可用 */ }
 
   // 2. 从文件名提取日期
+  // 优先匹配完整日期，然后匹配发文字号中的年份
+  const yearOnly = filename.match(/[〔（【\[](\d{4})[〕）】\]].*?(\d+)号/);
+  if (yearOnly) return `${yearOnly[1]}年`;
+
   const fnPatterns = [
     /(\d{4})年(\d{1,2})月(\d{1,2})日/,
     /(\d{4})-(\d{2})-(\d{2})/,
@@ -357,6 +360,10 @@ async function extractDate(filePath, text, filename) {
     const m = filename.match(p);
     if (m) return `${m[1]}年${m[2]}月${m[3]}日`;
   }
+
+  // 从文件名提取年份（如：2024年度、2024年总结、〔2024〕等）
+  const yearMatch = filename.match(/(\d{4})年/);
+  if (yearMatch) return `${yearMatch[1]}年`;
 
   // 3. 从文件正文提取日期
   for (const p of fnPatterns) {
@@ -650,7 +657,7 @@ async function main() {
     (filteredCount > 0 ? `（已排除 ${filteredCount} 个发文卡）` : '') + '\n');
 
   // ========== 分析 ==========
-  const header = '序号'.padEnd(5) + '文件名'.padEnd(40) + '页数'.padEnd(5) + '保管期限'.padEnd(8) + '大类'.padEnd(18) + '小类';
+  const header = '序号'.padEnd(5) + '文件名'.padEnd(34) + '日期'.padEnd(12) + '页数'.padEnd(5) + '保管期限'.padEnd(8) + '大类'.padEnd(18) + '小类';
   console.log('='.repeat(100));
   console.log(header);
   console.log('='.repeat(100));
@@ -696,7 +703,7 @@ async function main() {
     const scanned = isScanned ? ' 📷' : '';
     const hasFiles = attachments.length > 0 ? ' 📎' : '';
     const levelMark = isUpper ? ' ↑' : '';
-    console.log('\r' + String(i + 1).padEnd(5) + dispName.padEnd(40) +
+    console.log('\r' + String(i + 1).padEnd(5) + dispName.padEnd(34) + date.padEnd(12) +
       String(pages).padEnd(5) + retention.label.padEnd(8) +
       `${category.code}`.padEnd(18) +
       `${subcategory.id} ${subcategory.name}${scanned}${hasFiles}${levelMark}`);
